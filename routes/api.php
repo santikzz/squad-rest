@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\V1\GroupController;
 use App\Http\Controllers\V1\UserController;
+use App\Http\Controllers\V1\AuthController;
+use App\Http\Resources\V1\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,14 +18,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// api/v1
+Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('register', [AuthController::class, 'register']);
 });
 
-// api/v1
-Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], function(){
+// user authentication protected endpoints
+Route::middleware('auth:sanctum')->get('v1/user', function (Request $request) {
+    return new UserResource($request->user());
+});
 
+Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middleware' => ['auth:sanctum']], function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('groups', GroupController::class);
-
 });
