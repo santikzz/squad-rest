@@ -17,6 +17,10 @@ class User extends Authenticatable
         return $this->hasMany(Group::class);
     }
 
+    public function ownedGroups(){
+        return $this->hasMany(Group::class, 'owner_id');
+    }
+
     // a user can belong to many groups (many-to-many)
     public function joinedGroups(){
         return $this->belongsToMany(Group::class, 'user_group');

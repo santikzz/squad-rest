@@ -16,7 +16,7 @@ class GroupController extends Controller
     // list all groups paginated
     public function index()
     {
-        return new GroupCollection(Group::paginate());
+        return response()->json(new GroupCollection(Group::paginate()));
     }
 
     public function create()
@@ -26,7 +26,7 @@ class GroupController extends Controller
 
     public function store(StoreGroupRequest $request)
     {
-        //
+        return null;
     }
 
     // show group detail data
