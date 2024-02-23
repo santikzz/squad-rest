@@ -9,6 +9,15 @@ class Group extends Model
 {
     use HasFactory;
 
+    // protected $fillable = [
+    //     'ulid',
+    //     'owner_id',  
+    //     'title',
+    //     'description',
+    //     'privacy',
+    //     'max_members',
+    // ];
+
     // a group can be owned by one user (one-to-many)
     public function owner(){
         return $this->belongsTo(User::class, 'owner_id');

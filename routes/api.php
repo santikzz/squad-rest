@@ -36,9 +36,16 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('user/groups', [UserController::class, 'getOwnedGroups']);
     
     //Route::apiResource('users', UserController::class); // users listing shouldn't be available ( ? )
+    Route::get('user/{ulid}', [UserController::class, 'show']);
     
-    Route::apiResource('groups', GroupController::class);
-    // Route::get('groups', [GroupController::class, 'index']);
-    // Route::get('groups/{ulid}', [GroupController::class, 'show']);
+    // Route::apiResource('groups', GroupController::class);
+    Route::get('groups', [GroupController::class, 'index']);
+    Route::get('groups/{ulid}', [GroupController::class, 'show']);
+    
+    // GROUPS CRUD
+    Route::post('groups', [GroupController::class, 'create']);
+    Route::put('groups/{ulid}', [GroupController::class, 'update']);
+    Route::delete('groups/{ulid}', [GroupController::class, 'delete']);
+
 });
 
