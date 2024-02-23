@@ -36,9 +36,9 @@ The backend API is developed using PHP Laravel, while the frontend is implemente
 ```json
 {
     "ulid": "01hq8qaqpqmb6km9hkwnng63ce",
-    "name": "santiago",
-    "surname": "bugnon",
-    "email": "santibugnon@gmail.com"
+    "name": "Julia",
+    "surname": "Smith",
+    "email": "example@email.com"
 }
 ```
 ### Errors
