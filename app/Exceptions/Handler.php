@@ -33,7 +33,7 @@ class Handler extends ExceptionHandler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return response()->json(['error' => 'Unauthenticated.'], Response::HTTP_UNAUTHORIZED);
+        return response()->json(['error' => ['code' => 'unauthenticated', 'message' => 'User is not authenticated. Please log in or provide valid authentication credentials.']], Response::HTTP_UNAUTHORIZED);
     }
 
     public function render($request, Throwable $exception)

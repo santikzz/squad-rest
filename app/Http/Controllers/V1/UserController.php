@@ -12,6 +12,7 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserGroupJoinRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -28,7 +29,7 @@ class UserController extends Controller
         if ($user) {
             return response()->json(new UserResource($user));
         } else {
-            return response()->json(['message' => 'user not found'], 404);
+            return response()->json(['error' => ['code' => 'user_not_found', 'message' => 'User not found']], Response::HTTP_NOT_FOUND);
         }
     }
 

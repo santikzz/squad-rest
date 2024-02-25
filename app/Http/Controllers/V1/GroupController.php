@@ -35,7 +35,7 @@ class GroupController extends Controller
         if ($group) {
             return response()->json(new GroupResource($group));
         } else {
-            return response()->json(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -71,7 +71,8 @@ class GroupController extends Controller
 
             return response()->json(new GroupResource($group), Response::HTTP_CREATED);
         } catch (ValidationException $e) {
-            return response()->json(['message' => 'Invalid parameters'], Response::HTTP_BAD_REQUEST);
+            // return response()->json(['message' => 'Invalid parameters'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -80,10 +81,10 @@ class GroupController extends Controller
     {
         $group = Group::where('ulid', $ulid)->first();
         if (!$group) {
-            return response()->json(['error' => 'Group not found'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
         if ($group->owner_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => ['code' => 'unauthorized_group_modification', 'message' => 'You are not authorized to modify this group.']], Response::HTTP_UNAUTHORIZED);
         }
 
         try {
@@ -110,8 +111,7 @@ class GroupController extends Controller
 
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
-
-            return response()->json(['message' => 'Invalid parameters'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'invalid_group_parameters', 'message' => 'Invalid or malformed parameters for group creation.']], Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -120,13 +120,13 @@ class GroupController extends Controller
     {
         $group = Group::where('ulid', $ulid)->first();
         if (!$group) {
-            return response()->json(['error' => 'Group not found'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
         if ($group->owner_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => ['code' => 'unauthorized_group_modification', 'message' => 'You are not authorized to modify this group.']], Response::HTTP_UNAUTHORIZED);
         }
         $group->delete();
-        return response()->json(['message' => 'Group deleted successfully'], Response::HTTP_OK);
+        return response()->json(['message' => 'Group deleted successfully.'], Response::HTTP_OK);
     }
 
     public function join(Request $request, $ulid)
@@ -135,12 +135,12 @@ class GroupController extends Controller
         $user = $request->user();
 
         if (!$group) {
-            return response()->json(['error' => 'Group not found'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
 
         // reject if user is owner, can't join it's own group
         if ($group->owner_id == auth()->id()) {
-            return response()->json(['error' => 'You are the owner of this group'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'cannot_join_own_group', 'message' => 'You cannot join a group you own.']], Response::HTTP_BAD_REQUEST);
         }
 
         // reject if user is already in the group
@@ -149,12 +149,12 @@ class GroupController extends Controller
             ->where('group_id', $group->id)
             ->exists();
         if ($alreadyMember) {
-            return response()->json(['message' => 'User is already a member of the group'], Response::HTTP_FORBIDDEN);
+            return response()->json(['error' => ['code' => 'already_group_member', 'message' => 'You are already a member of this group.']], Response::HTTP_BAD_REQUEST);
         }
 
         // reject if the group has a member limit, and its already full
         if ($group->max_members != NULL && ($group->members->count() + 1) >= $group->max_members) {
-            return response()->json(['message' => 'Group is already full'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => ['code' => 'group_full', 'message' => 'The group is full.']], Response::HTTP_BAD_REQUEST);
         }
 
         // check if group is closed, send join request
@@ -166,7 +166,7 @@ class GroupController extends Controller
                 ->where('group_id', $group->id)
                 ->exists();
             if ($requestAlreadyExists) {
-                return response()->json(['message' => 'You already sent a join request to that group'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['error' => ['code' => 'join_request_already_sent', 'message' => 'You have already sent a join request to this group.']], Response::HTTP_BAD_REQUEST);
             }
 
             // make join request
@@ -176,12 +176,15 @@ class GroupController extends Controller
                 'group_id' => $group->id,
                 'owner_id' => $group->owner_id
             ]);
-            return response()->json(['message' => 'Join request sent']);
+            return response()->json(['message' => 'Join request sent successfully.']);
         }
 
         // if the group is private, return unauthorized
         if ($group->privacy == 'private') {
-            return response()->json(['message' => 'You cant join a private group'], Response::HTTP_UNAUTHORIZED);
+            // if ($request->has('secret')) {
+            // $secret = $request->query('secret');
+            // }
+            return response()->json(['error' => ['code' => 'private_group', 'message' => 'You can\'t join a private group.']], Response::HTTP_BAD_REQUEST);
         }
 
         // if it's open, just join
@@ -189,21 +192,21 @@ class GroupController extends Controller
             'user_id' => $user->id,
             'group_id' => $group->id
         ]);
-        return response()->json(['message' => 'User joined the group successfully']);
+        return response()->json(['message' => 'Group joined successfully.'], Response::HTTP_OK);
     }
 
     public function getJoinRequests(Request $request, $ulid)
-    {   
+    {
         $group = Group::where('ulid', $ulid)->first();
         $user = $request->user();
 
         if (!$group) {
-            return response()->json(['error' => 'Group not found'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
 
         // reject if user is not the owner
         if ($group->owner_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_BAD_REQUEST);
         }
 
         return response()->json(JoinRequestResource::collection($group->joinRequests));
