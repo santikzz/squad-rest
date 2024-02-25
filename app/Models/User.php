@@ -13,17 +13,25 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     // a user can own many groyps (one-to-many)
-    public function groups(){
+    public function groups()
+    {
         return $this->hasMany(Group::class);
     }
 
-    public function ownedGroups(){
+    public function ownedGroups()
+    {
         return $this->hasMany(Group::class, 'owner_id');
     }
 
     // a user can belong to many groups (many-to-many)
-    public function joinedGroups(){
+    public function joinedGroups()
+    {
         return $this->belongsToMany(Group::class, 'user_group');
+    }
+
+    public function joinRequests()
+    {
+        return $this->hasMany(UserGroupJoinRequest::class, 'user_id');
     }
 
     /**
@@ -36,7 +44,7 @@ class User extends Authenticatable
         'name',
         'surname',
         'email',
-        'password',  
+        'password',
     ];
 
     /**

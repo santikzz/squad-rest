@@ -17,7 +17,7 @@ class GroupResource extends JsonResource
             'description' => $this->description,
             'tags' => $this->tags->pluck('tag'), //GroupTagResource::collection($this->tags),
             'maxMembers' => $this->max_members,
-            'memersCount' => $this->members->count(),
+            'memersCount' => ($this->members->count()+1),
             'privacy' => $this->privacy,
             'members' => UserGroupResource::collection($this->members),
         ];

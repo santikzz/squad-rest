@@ -18,10 +18,10 @@ class AuthController extends Controller
         $user = User::where('email',  $request->email)->first();
 
         if (!$user) {    
-            return response()->json(['message' => ['Invalid email or username']], 422);
+            return response()->json(['message' => ['Invalid email or username']], 404);
         }
         if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => ['Invalid password']], 422);
+            return response()->json(['message' => ['Invalid password']], 404);
         }
 
         $user->tokens()->delete();
@@ -44,7 +44,7 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8|confirmed',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['error' => 'Email is already taken.'], 422);
+            return response()->json(['error' => 'Invalid input'], 422);
         }
 
         $ulid = Ulid::generate(true);
