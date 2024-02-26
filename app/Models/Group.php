@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class Group extends Model
 {
@@ -45,4 +46,5 @@ class Group extends Model
     {
         return $this->hasMany(UserGroupJoinRequest::class, 'group_id');
     }
+
 }

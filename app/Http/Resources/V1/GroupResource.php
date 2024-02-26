@@ -20,6 +20,7 @@ class GroupResource extends JsonResource
             'memersCount' => ($this->members->count()+1),
             'privacy' => $this->privacy,
             'members' => UserGroupResource::collection($this->members),
+            'creationDate' => $this->created_at,
         ];
     }
 }

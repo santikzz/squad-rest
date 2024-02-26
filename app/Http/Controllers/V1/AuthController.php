@@ -41,13 +41,18 @@ class AuthController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'surname' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
+                'name' => 'required|string|max:50',
+                'surname' => 'required|string|max:50',
+                'email' => 'required|string|email|max:255',
                 'password' => 'required|string|min:8|confirmed',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['error' => ['code' => 'invalid_registration_input', 'message' => 'Invalid input data for user registration. Please check your input.']], Response::HTTP_BAD_REQUEST);
+        }
+
+        $alreadyExists = User::where('email', $validatedData['email'])->exists();
+        if($alreadyExists){
+            return response()->json(['error' => ['code' => 'email_already_taken', 'message' => 'The email address is already taken.']], Response::HTTP_BAD_REQUEST);
         }
 
         $ulid = Ulid::generate(true);

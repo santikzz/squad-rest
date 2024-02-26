@@ -33,26 +33,24 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('logout', [AuthController::class, 'logout']);
     
     // private self user endpoints
-    Route::get('user', function (Request $request) { return new UserResource($request->user()); });                         // get self user data
-    Route::get('user/groups', [UserController::class, 'getOwnedGroups']);                                                   // get self user groups
-    Route::get('user/groups/joined', [UserController::class, 'getJoinedGroups']);                                           // get self user joined groups
-    Route::get('user/groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);                                 // get self user owned {group_id} join requests
-    Route::get('user/groups/requests', [UserController::class, 'getJoinRequests']);                                         // get self user all owned groups join requests
+    Route::get('user', function (Request $request) { return new UserResource($request->user()); });
+    Route::get('user/groups', [UserController::class, 'getOwnedGroups']);
+    Route::get('user/groups/joined', [UserController::class, 'getJoinedGroups']);
+    Route::get('user/groups/{group}/kick/{user}', [GroupController::class, 'kick']);
+    Route::get('user/groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
+    Route::get('user/groups/requests', [UserController::class, 'getJoinRequests']);
+                                
+    Route::get('users/{ulid}', [UserController::class, 'show']);
+    
+    Route::get('groups', [GroupController::class, 'index']);
+    Route::get('groups/{ulid}', [GroupController::class, 'show']);
+    Route::post('groups', [GroupController::class, 'create']);
+    Route::put('groups/{ulid}', [GroupController::class, 'update']);
+    Route::delete('groups/{ulid}', [GroupController::class, 'delete']);
+    Route::get('groups/{ulid}/join', [GroupController::class, 'join']);
+    Route::get('groups/{ulid}/leave', [GroupController::class, 'leave']);
+    
 
-    
-    // public group endpoints
-    Route::get('users/{ulid}', [UserController::class, 'show']);                                                            // get user {user_id} data
-    
-    Route::get('groups', [GroupController::class, 'index']);                                                                // get groups listing - paginated
-    Route::get('groups/{ulid}', [GroupController::class, 'show']);                                                          // get group {group_id} data
-    
-    Route::post('groups', [GroupController::class, 'create']);                                                              // create group
-    Route::put('groups/{ulid}', [GroupController::class, 'update']);                                                        // update {group_id} data
-    Route::delete('groups/{ulid}', [GroupController::class, 'delete']);                                                     // delte {group_id} group
-    
-    Route::get('groups/{ulid}/join', [GroupController::class, 'join']);                                                     // join / request access to group
-    
-    // Route::get('groups/{group}/kick/{user}', [GroupController::class, 'kick']);
     
     // Route::get('groups/search', [GroupController::class, 'search']);
     // https://m.dotdev.co/writing-advanced-eloquent-search-query-filters-de8b6c2598db

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\User;
 use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\V1\GroupResource;
@@ -20,15 +21,29 @@ use App\Http\Resources\V1\JoinRequestResource;
 class GroupController extends Controller
 {
     // list all groups paginated
-    public function index()
+    public function index(Request $request)
     {
-        $groups = Group::where('privacy', '!=', 'private')->paginate();
+
+        $groups = Group::where('privacy', '!=', 'private')->orderby('created_at', 'desc');
+
+        if ($request->has('search')) {
+            $seach_param = $request->query('search');
+            $groups = $groups->where('title', 'LIKE', '%' . $seach_param . '%')->orWhere('description', 'LIKE', '%' . $seach_param . '%');
+        }
+
+        // if($request->has('tag')){
+        //     $tag = $request->query('tag');
+        //     $groups = $groups->where('tag', '=', $tag);
+        // }
+
         // $groups = Group::whereNotIn('privacy', ['private'])->paginate();
-        return response()->json(new GroupCollection($groups));
+
+        // return response()->json(new GroupCollection($groups->paginate()));
+        return new GroupCollection($groups->paginate());
     }
 
     // show group detail data
-    public function show($ulid)
+    public function show(Request $request, $ulid)
     {
         $group = Group::with('owner', 'members', 'tags')->where('ulid', $ulid)->whereNotIn('privacy', ['private'])->first();
 
@@ -61,7 +76,7 @@ class GroupController extends Controller
             }
 
             $group->ulid = (string)$ulid;
-            $group->owner_id = auth()->id();
+            $group->owner_id = $request->user()->id;
             $group->title = $validatedData['title'];
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
@@ -83,7 +98,7 @@ class GroupController extends Controller
         if (!$group) {
             return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
-        if ($group->owner_id !== auth()->id()) {
+        if ($group->owner_id !== $request->user()->id) {
             return response()->json(['error' => ['code' => 'unauthorized_group_modification', 'message' => 'You are not authorized to modify this group.']], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -122,7 +137,7 @@ class GroupController extends Controller
         if (!$group) {
             return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
-        if ($group->owner_id !== auth()->id()) {
+        if ($group->owner_id !== $request->user()->id) {
             return response()->json(['error' => ['code' => 'unauthorized_group_modification', 'message' => 'You are not authorized to modify this group.']], Response::HTTP_UNAUTHORIZED);
         }
         $group->delete();
@@ -139,7 +154,7 @@ class GroupController extends Controller
         }
 
         // reject if user is owner, can't join it's own group
-        if ($group->owner_id == auth()->id()) {
+        if ($group->owner_id == $request->user()->id) {
             return response()->json(['error' => ['code' => 'cannot_join_own_group', 'message' => 'You cannot join a group you own.']], Response::HTTP_BAD_REQUEST);
         }
 
@@ -198,17 +213,62 @@ class GroupController extends Controller
     public function getJoinRequests(Request $request, $ulid)
     {
         $group = Group::where('ulid', $ulid)->first();
-        $user = $request->user();
+        if (!$group) {
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
+        }
+        // reject if user is not the owner
+        if ($group->owner_id !== $request->user()->id) {
+            return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_BAD_REQUEST);
+        }
+        return response()->json(JoinRequestResource::collection($group->joinRequests));
+    }
+
+    public function kick(Request $request, $group, $user)
+    {
+
+        $group = Group::where('ulid', $group)->first();
+        $user = User::where('ulid', $user)->first();
 
         if (!$group) {
             return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
 
-        // reject if user is not the owner
-        if ($group->owner_id !== auth()->id()) {
-            return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_BAD_REQUEST);
+        if ($group->owner_id !== $request->user()->id) {
+            return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_UNAUTHORIZED);
+        } else {
+            return response()->json(['error' => ['code' => 'cannot_kick_yourself', 'message' => 'You cannot kick yourself from the group.']], Response::HTTP_BAD_REQUEST);
         }
 
-        return response()->json(JoinRequestResource::collection($group->joinRequests));
+        if (!$user) {
+            return response()->json(['error' => ['code' => 'user_not_found', 'message' => 'User not found']], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$group->users()->where('ulid', $user->ulid)->exists()) {
+            return response()->json(['error' => ['code' => 'user_not_in_group', 'message' => 'The specified user does not exist in this group.']], Response::HTTP_NOT_FOUND);
+        }
+
+        $group->users()->detach($user);
+
+        return response()->json(['message' => 'User kicked from the group successfully'], Response::HTTP_OK);
+    }
+
+    public function leave(Request $request, $ulid)
+    {
+        $group = Group::where('ulid', $ulid)->first();
+
+        if (!$group) {
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($group->owner_id == $request->user()->id) {
+            return response()->json(['error' => ['code' => 'cannot_leave_own_group', 'message' => 'As the owner, you cannot leave your own group. Consider deleting the group instead.']], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$group->users()->where('id', $request->user()->id)->exists()) {
+            return response()->json(['error' => ['code' => 'user_not_in_group', 'message' => 'You are not a member of this group, so you cannot leave it.']], Response::HTTP_NOT_FOUND);
+        }
+
+        $group->users()->detach($request->user()->id);
+        return response()->json(['message' => 'You have left the group successfully'], Response::HTTP_OK);
     }
 }
