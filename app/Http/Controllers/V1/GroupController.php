@@ -235,7 +235,9 @@ class GroupController extends Controller
 
         if ($group->owner_id !== $request->user()->id) {
             return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_UNAUTHORIZED);
-        } else {
+        }
+        
+        if ($user == $request->user()->id){
             return response()->json(['error' => ['code' => 'cannot_kick_yourself', 'message' => 'You cannot kick yourself from the group.']], Response::HTTP_BAD_REQUEST);
         }
 
