@@ -34,11 +34,16 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     
     // private self user endpoints
     Route::get('user', function (Request $request) { return new UserResource($request->user()); });
+    
+    Route::get('user/requests', [UserController::class, 'getJoinRequests']);
+    Route::get('user/requests/{requestId}/{action}', [GroupController::class, 'handleJoinRequest']);
+    
+    Route::get('user/joined', [UserController::class, 'getJoinedGroups']);
+
     Route::get('user/groups', [UserController::class, 'getOwnedGroups']);
-    Route::get('user/groups/joined', [UserController::class, 'getJoinedGroups']);
+    Route::get('user/groups/{ulid}', [GroupController::class, 'showOwnerGroup']);
     Route::get('user/groups/{group}/kick/{user}', [GroupController::class, 'kick']);
     Route::get('user/groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
-    Route::get('user/groups/requests', [UserController::class, 'getJoinRequests']);
                                 
     Route::get('users/{ulid}', [UserController::class, 'show']);
     
