@@ -33,9 +33,9 @@ class Handler extends ExceptionHandler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if($request->is('admin')){
-            return true;
-        }
+        // if($request->is('admin')){
+        //     return true;
+        // }
 
         return response()->json(['error' => ['code' => 'unauthenticated', 'message' => 'User is not authenticated. Please log in or provide valid authentication credentials.']], Response::HTTP_UNAUTHORIZED);
     }

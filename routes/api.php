@@ -56,8 +56,4 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('groups/{ulid}/leave', [GroupController::class, 'leave']);
     
 
-    
-    // Route::get('groups/search', [GroupController::class, 'search']);
-    // https://m.dotdev.co/writing-advanced-eloquent-search-query-filters-de8b6c2598db
-
 });
