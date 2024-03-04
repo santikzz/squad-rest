@@ -27,8 +27,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('SQUAD')
+            ->brandLogo(asset('images/squad_black.png'))
+            ->darkModeBrandLogo(asset('images/squad.png'))
+            ->brandLogoHeight('100%')
+            ->favicon(asset('images/logo_white.png'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#ef4444',//Color::Emerald,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
