@@ -76,6 +76,7 @@ class GroupController extends Controller
                 'privacy' => 'required|string|in:open,closed,private',
                 'hasMemberLimit' => 'nullable|boolean',
                 'maxMembers' => 'nullable|integer|min:2|max:99',
+                'idCarrera' => 'integer|min:1',
             ]);
 
             $group = new Group();
@@ -93,6 +94,7 @@ class GroupController extends Controller
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
             $group->privacy = $validatedData['privacy'];
+            $group->id_carrera = $validatedData['idCarrera'];
 
             $group->save();
 
@@ -122,6 +124,7 @@ class GroupController extends Controller
                 'privacy' => 'required|string|in:open,closed,private',
                 'hasMemberLimit' => 'nullable|boolean',
                 'maxMembers' => 'nullable|integer|min:2|max:99',
+                'idCarrera' => 'integer|min:1',
             ]);
 
             $maxMembers = null;
@@ -133,6 +136,7 @@ class GroupController extends Controller
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
             $group->privacy = $validatedData['privacy'];
+            $group->id_carrera = $validatedData['idCarrera'];
 
             $group->update();
 

@@ -66,13 +66,21 @@ class GroupResource extends Resource
                                         return $record->members->count() . $limit;
                                     })
                                     ->icon('heroicon-s-user')->grow(false)->alignRight(),
+                                Tables\Columns\TextColumn::make('carrera')
+                                ->state(function (Group $record): string {
+                                    return $record->carrera->facultad->name.' - '.$record->carrera->name;
+                                })->icon('heroicon-s-academic-cap'),
+
+
                             ]),
 
                             Tables\Columns\TextColumn::make('description')->searchable()->color('gray'),
                             Tables\Columns\TextColumn::make('members.name')
                                 ->state(function (Group $record): string {
                                     $members = [];
-                                    foreach($record->members as $member){ array_push($members, $member->name.' '.$member->surname); }
+                                    foreach ($record->members as $member) {
+                                        array_push($members, $member->name . ' ' . $member->surname);
+                                    }
                                     return implode(', ', $members);
                                 })->searchable()->color('gray'),
 
