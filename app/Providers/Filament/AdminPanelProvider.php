@@ -28,12 +28,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->defaultThemeMode(ThemeMode::Dark)
             ->brandName('SQUAD')
             ->brandLogo(asset('images/squad_black.png'))
             ->darkModeBrandLogo(asset('images/squad.png'))
             ->brandLogoHeight('100%')
             ->favicon(asset('images/logo_white.png'))
-            ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary' => '#ef4444',//Color::Emerald,
             ])
