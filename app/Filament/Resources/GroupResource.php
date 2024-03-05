@@ -17,7 +17,10 @@ class GroupResource extends Resource
 {
     protected static ?string $model = Group::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Groups';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    // protected static ?string $navigationGroup = 'Groups';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -63,7 +66,7 @@ class GroupResource extends Resource
                                 Tables\Columns\TextColumn::make('memebers')
                                     ->state(function (Group $record): string {
                                         $limit = $record->max_members != null ? ' / ' . $record->max_members : '';
-                                        return $record->members->count() . $limit;
+                                        return $record->members->count()+1 . $limit;
                                     })
                                     ->icon('heroicon-s-user')->grow(false)->alignRight(),
                                 Tables\Columns\TextColumn::make('carrera')

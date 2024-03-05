@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\User;
+use App\Models\Tag;
 use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\V1\GroupResource;
@@ -74,9 +75,11 @@ class GroupController extends Controller
                 'title' => 'required|string|min:10|max:64',
                 'description' => 'required|string|min:10|max:255',
                 'privacy' => 'required|string|in:open,closed,private',
-                'hasMemberLimit' => 'nullable|boolean',
-                'maxMembers' => 'nullable|integer|min:2|max:99',
-                'idCarrera' => 'integer|min:1',
+                // 'hasMemberLimit' => 'nullable|boolean',
+                'maxMembers' => 'nullable|integer|min:1|max:25',
+                'idCarrera' => 'required|integer|min:1',
+                'tags' => 'required|array',
+                'tags.*' => 'string|max:255',
             ]);
 
             $group = new Group();
@@ -84,8 +87,9 @@ class GroupController extends Controller
             $ulid = Ulid::generate(true);
 
             $maxMembers = null;
-            if ($request->has('hasMemberLimit', 'maxMembers')) {
-                $maxMembers = $validatedData['hasMemberLimit'] == 1 ? $validatedData['maxMembers'] : null;
+            if ($request->has('maxMembers')) {
+                // $maxMembers = $validatedData['hasMemberLimit'] == 1 ? $validatedData['maxMembers'] : null;
+                $maxMembers = $validatedData['maxMembers'];
             }
 
             $group->ulid = (string)$ulid;
@@ -97,6 +101,11 @@ class GroupController extends Controller
             $group->id_carrera = $validatedData['idCarrera'];
 
             $group->save();
+
+            foreach($validatedData['tags'] as $tag){
+                $tag = Tag::where('tag', $tag)->first();
+                $group->tags()->attach($tag);
+            }
 
             return response()->json(new GroupResource($group), Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -122,14 +131,17 @@ class GroupController extends Controller
                 'title' => 'required|string|min:10|max:64',
                 'description' => 'required|string|min:10|max:255',
                 'privacy' => 'required|string|in:open,closed,private',
-                'hasMemberLimit' => 'nullable|boolean',
-                'maxMembers' => 'nullable|integer|min:2|max:99',
+                // 'hasMemberLimit' => 'nullable|boolean',
+                'maxMembers' => 'nullable|integer|min:1|max:25',
                 'idCarrera' => 'integer|min:1',
+                'tags' => 'required|array',
+                'tags.*' => 'string|max:255',
             ]);
 
             $maxMembers = null;
-            if ($request->has('hasMemberLimit', 'maxMembers')) {
-                $maxMembers = $validatedData['hasMemberLimit'] == 1 ? $validatedData['maxMembers'] : null;
+            if ($request->has('maxMembers')) {
+                // $maxMembers = $validatedData['maxMembers'] >= 1 ? $validatedData['maxMembers'] : null;
+                $maxMembers = $validatedData['maxMembers'];
             }
 
             $group->title = $validatedData['title'];
@@ -139,6 +151,12 @@ class GroupController extends Controller
             $group->id_carrera = $validatedData['idCarrera'];
 
             $group->update();
+
+            $group->tags()->detach();
+            foreach($validatedData['tags'] as $tag){
+                $tag = Tag::where('tag', $tag)->first();
+                $group->tags()->attach($tag);
+            }
 
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
