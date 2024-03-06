@@ -30,27 +30,36 @@ class GroupController extends Controller
 
         if ($request->has('search')) {
             $seach_param = $request->query('search');
-            $groups = $groups->where('title', 'LIKE', '%' . $seach_param . '%')->orWhere('description', 'LIKE', '%' . $seach_param . '%');
+            $groups = $groups->where('title', 'LIKE', '%' . $seach_param . '%')
+                ->orWhere('description', 'LIKE', '%' . $seach_param . '%');
         }
 
-        // if($request->has('tag')){
-        //     $tag = $request->query('tag');
-        //     $groups = $groups->where('tag', '=', $tag);
-        // }
+        if ($request->has('tags')) {
+            $tags = explode(',', $request->query('tags'));
 
-        // $groups = Group::whereNotIn('privacy', ['private'])->paginate();
+            foreach ($tags as $tag) {
+                $groups = $groups->whereHas('tags', function ($query) use ($tag) {
+                    $query->where('tag', $tag);
+                });
+            }
+        }
 
-        // return response()->json(new GroupCollection($groups->paginate()));
         return new GroupCollection($groups->paginate());
     }
 
     // show group detail data
     public function show(Request $request, $ulid)
     {
-        $group = Group::with('owner', 'members', 'tags')->where('ulid', $ulid)->whereNotIn('privacy', ['private'])->first();
+        // $group = Group::with('owner', 'members', 'tags')->where('ulid', $ulid)->whereNotIn('privacy', ['private'])->first();
+        $group = Group::with('owner', 'members', 'tags')->where('ulid', $ulid)->first();
         if (!$group) {
             return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
         }
+
+        if ($group->privacy == 'private' && $group->owner_id !== $request->user()->id) {
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
+        }
+
         return response()->json(new GroupResource($group));
     }
 
@@ -102,7 +111,7 @@ class GroupController extends Controller
 
             $group->save();
 
-            foreach($validatedData['tags'] as $tag){
+            foreach ($validatedData['tags'] as $tag) {
                 $tag = Tag::where('tag', $tag)->first();
                 $group->tags()->attach($tag);
             }
@@ -153,7 +162,7 @@ class GroupController extends Controller
             $group->update();
 
             $group->tags()->detach();
-            foreach($validatedData['tags'] as $tag){
+            foreach ($validatedData['tags'] as $tag) {
                 $tag = Tag::where('tag', $tag)->first();
                 $group->tags()->attach($tag);
             }
@@ -178,8 +187,18 @@ class GroupController extends Controller
         return response()->json(['message' => 'Group deleted successfully.'], Response::HTTP_OK);
     }
 
-    public function join(Request $request, $ulid)
+    public function join(Request $request, $ulid = null)
     {
+
+        // $isInviteLink = false;
+        // if($ulid == null && $request->has('invite')){
+        //     $isInviteLink = true;
+        //     $inviteId = $request->query('invite');
+        //     $group = Group::where('invite', $inviteId)->first();
+        // }else{
+        //     $group = Group::where('ulid', $ulid)->first();
+        // }
+        
         $group = Group::where('ulid', $ulid)->first();
         $user = $request->user();
 
@@ -334,21 +353,38 @@ class GroupController extends Controller
         }
 
         if ($action == 'accept') {
-            
+
             DB::table('user_group')->insert([
                 'user_id' => $user->id,
                 'group_id' => $group->id
             ]);
             DB::table('user_group_join_request')->where('request_id', $requestId)->delete();
             return response()->json(['message' => 'Request accepted'], Response::HTTP_OK);
-        
-        }elseif($action == 'decline'){
-            
+        } elseif ($action == 'decline') {
+
             DB::table('user_group_join_request')->where('request_id', $requestId)->delete();
             return response()->json(['message' => 'Request declined'], Response::HTTP_OK);
-        
-        }else{
+        } else {
             return response()->json(['error' => ['code' => 'invalid_action', 'message' => 'Invalid action']], Response::HTTP_NOT_FOUND);
         }
+    }
+
+    public function getInviteLink(Request $request, $ulid)
+    {
+        $group = Group::where('ulid', $ulid)->first();
+        if (!$group) {
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
+        }
+        // reject if user is not the owner
+        if ($group->owner_id !== $request->user()->id) {
+            return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_BAD_REQUEST);
+        }
+
+        if($group->invite == null){
+            $group->invite = Str::random(10);
+            $group->update();
+        }
+
+        return response()->json(['invite' => 'api/v1/groups/join?invite=fDgSk3sdg='], Response::HTTP_OK);
     }
 }

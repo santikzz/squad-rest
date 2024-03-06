@@ -25,6 +25,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('privacy');
             $table->integer('max_members')->nullable();
+            $table->string('invite')->nullable();
             $table->timestamps();
         });
     }

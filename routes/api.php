@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 // public endpoints
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], function () {
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10:5');
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5:10'); // rate limit error: 429
 });
 
 // user authentication protected endpoints
@@ -38,14 +38,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     
     Route::get('user/requests', [UserController::class, 'getJoinRequests']);
     Route::get('user/requests/{requestId}/{action}', [GroupController::class, 'handleJoinRequest']);
-    
     Route::get('user/joined', [UserController::class, 'getJoinedGroups']);
-
     Route::get('user/groups', [UserController::class, 'getOwnedGroups']);
-    Route::get('user/groups/{ulid}', [GroupController::class, 'showOwnerGroup']);
-    Route::get('user/groups/{group}/kick/{user}', [GroupController::class, 'kick']);
-    Route::get('user/groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
-                                
+                
     Route::get('users/{ulid}', [UserController::class, 'show']);
     
     Route::get('groups', [GroupController::class, 'index']);
@@ -53,8 +48,13 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::post('groups', [GroupController::class, 'create']);
     Route::put('groups/{ulid}', [GroupController::class, 'update']);
     Route::delete('groups/{ulid}', [GroupController::class, 'delete']);
-    Route::get('groups/{ulid}/join', [GroupController::class, 'join']);
-    Route::get('groups/{ulid}/leave', [GroupController::class, 'leave']);
+    Route::get('groups/join/{ulid}', [GroupController::class, 'join']);
+    Route::get('groups/leave/{ulid}', [GroupController::class, 'leave']);
+
+    //Route::get('groups/{ulid}', [GroupController::class, 'showOwnerGroup']);
+    Route::get('groups/{group}/kick/{user}', [GroupController::class, 'kick']);
+    Route::get('groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
+    Route::get('groups/{ulid}/invite', [GroupController::class, 'getInviteLink']);
     
 
 });
