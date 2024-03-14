@@ -24,8 +24,10 @@ use Illuminate\Support\Facades\Route;
 
 // public endpoints
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], function () {
-    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10:5');
-    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5:10'); // rate limit error: 429
+    // Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10:5');
+    // Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5:10'); // rate limit error: 429
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']); // rate limit error: 429
 });
 
 // user authentication protected endpoints

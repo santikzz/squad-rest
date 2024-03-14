@@ -1,0 +1,137 @@
+* [33mcommit 0ba436462ef75b9aa0b9934610f79d9ee5dd9626[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Wed Mar 6 15:36:57 2024 -0300
+[31m|[m 
+[31m|[m     tag filtering, login rate limit
+[31m|[m 
+* [33mcommit 7c42f0bbb150dc06ceaeb81e22cad5b9439c2387[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Tue Mar 5 20:13:20 2024 -0300
+[31m|[m 
+[31m|[m     add group create tags, overall fix
+[31m|[m 
+* [33mcommit 3b8a8aa141ff8374097611e537d660fcd02d9068[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Tue Mar 5 19:18:17 2024 -0300
+[31m|[m 
+[31m|[m     add facutades, carreras
+[31m|[m 
+* [33mcommit 688f3d199c451984a52e7d99544293ca801cb31f[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Tue Mar 5 17:56:52 2024 -0300
+[31m|[m 
+[31m|[m     wtf
+[31m|[m 
+* [33mcommit f5527584d486ee4927d946d865e60c80592983cd[m[33m ([m[1;32mfilament[m[33m)[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Tue Mar 5 17:34:52 2024 -0300
+[31m|[m 
+[31m|[m     pre merge
+[31m|[m 
+* [33mcommit e51a7e760079c9ae39cca917284892bb55e87253[m[33m ([m[1;31morigin/filament[m[33m)[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Mon Mar 4 13:34:03 2024 -0300
+[31m|[m 
+[31m|[m     default theme fix
+[31m|[m 
+* [33mcommit 8860b5e232f9c8ba609d52b93d8a8ad5254bbdea[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Mon Mar 4 13:29:08 2024 -0300
+[31m|[m 
+[31m|[m     theme
+[31m|[m 
+* [33mcommit 053da4275fd3f2c306b2b79f7e908c766218abc8[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Mon Mar 4 01:12:46 2024 -0300
+[31m|[m 
+[31m|[m     panel theme
+[31m|[m 
+* [33mcommit 9fd57fb4eb6c9a9a8263554fee5c4c45b9662dbd[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Mon Mar 4 00:39:41 2024 -0300
+[31m|[m 
+[31m|[m     unauthorized fix
+[31m|[m 
+* [33mcommit 5839772076f8346a3991c912e445f48335ff81eb[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Sun Mar 3 16:11:40 2024 -0300
+[31m|[m 
+[31m|[m     add filament panel
+[31m|[m 
+* [33mcommit 5f03c5dc7c5d9eac34d9dd6e19322ca7bc259899[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Thu Feb 29 20:44:54 2024 -0300
+[31m|[m 
+[31m|[m     kick bug fix
+[31m|[m 
+* [33mcommit 09a4f1e5dc415853f92e6f4918d1c1921720d4ca[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Thu Feb 29 20:41:13 2024 -0300
+[31m|[m 
+[31m|[m     kick bug fix
+[31m|[m 
+* [33mcommit 0c8d10d4dce73c917e2626bac3b407117d26f905[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Wed Feb 28 22:53:32 2024 -0300
+[31m|[m 
+[31m|[m     test raspberry server
+[31m|[m 
+* [33mcommit a3096b98daa80d7a0176d2d3f50398095d6dc851[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Mon Feb 26 16:18:13 2024 -0300
+[31m|[m 
+[31m|[m     kick members, leave group, modify user data, overall fixes
+[31m|[m 
+* [33mcommit 8053aff3d67e145351b1fe06d98384b25327d51d[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Sun Feb 25 19:21:28 2024 -0300
+[31m|[m 
+[31m|[m     fix logout, add better error responses
+[31m|[m 
+* [33mcommit 706b80135105e80c70e9b43bdca724402f38d9bc[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Sun Feb 25 01:11:05 2024 -0300
+[31m|[m 
+[31m|[m     group join, join requests, hide private groups
+[31m|[m 
+* [33mcommit 1f69f62639c76b40f5b1fd459a26989796e28520[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Fri Feb 23 11:33:10 2024 -0300
+[31m|[m 
+[31m|[m     group crud
+[31m|[m 
+* [33mcommit 776096c2390423bd2a171fc63e90004dfd56ba51[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Fri Feb 23 11:32:08 2024 -0300
+[31m|[m 
+[31m|[m     group crud
+[31m|[m 
+* [33mcommit 0c68afd037a96a3195bfaf32a4cdc7cfb686accc[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Thu Feb 22 14:22:41 2024 -0300
+[31m|[m 
+[31m|[m     user self endpoints
+[31m|[m 
+* [33mcommit 87950672c55f281242d868b90871afc2ca2ec239[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Thu Feb 22 13:52:58 2024 -0300
+[31m|[m 
+[31m|[m     add user authentication
+[31m|[m 
+* [33mcommit 36f36fc91c30949139931db0c25523deacd2302d[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Wed Feb 21 17:36:43 2024 -0300
+[31m|[m 
+[31m|[m     update readme
+[31m|[m 
+* [33mcommit fa59cda3865073a7cb1d6e797268089dba463e76[m
+[31m|[m Author: ssanti86 <monsterspeed02@gmail.com>
+[31m|[m Date:   Wed Feb 21 17:30:21 2024 -0300
+[31m|[m 
+[31m|[m     add logo
+[31m|[m 
+* [33mcommit f076ea1a0552b37ab97d5b19e9824aaf66303bbb[m
+  Author: ssanti86 <monsterspeed02@gmail.com>
+  Date:   Wed Feb 21 17:27:04 2024 -0300
+  
+      first commit
