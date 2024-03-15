@@ -19,7 +19,7 @@ class GroupResource extends JsonResource
             'facultad' => $this->carrera->facultad->name,
             'carrera' => $this->carrera->name,
             'maxMembers' => $this->max_members,
-            'memersCount' => ($this->members->count()+1),
+            'membersCount' => ($this->members->count()+1),
             'privacy' => $this->privacy,
             'members' => UserGroupResource::collection($this->members),
             'creationDate' => $this->created_at,
