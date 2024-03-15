@@ -19,21 +19,22 @@ class RateLimitMiddleware
 
     public function handle($request, Closure $next, $maxAttempts = 50, $decayMinutes = 1)
     {
-        $key = $request->ip();
+        // $key = $request->ip();
 
-        if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            return response()->json(['message' => 'Too many attempts. Please try again later.'], Response::HTTP_TOO_MANY_REQUESTS);
-        }
+        // if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
+        //     return response()->json(['message' => 'Too many attempts. Please try again later.'], Response::HTTP_TOO_MANY_REQUESTS);
+        // }
 
-        $this->limiter->hit($key, $decayMinutes);
+        // $this->limiter->hit($key, $decayMinutes);
 
-        $response = $next($request);
+        // $response = $next($request);
 
-        return $this->addHeaders(
-            $response,
-            $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts)
-        );
+        // return $this->addHeaders(
+        //     $response,
+        //     $maxAttempts,
+        //     $this->calculateRemainingAttempts($key, $maxAttempts)
+        // );
+        return;
     }
 
     protected function addHeaders($response, $maxAttempts, $remainingAttempts)
