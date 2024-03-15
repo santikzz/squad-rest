@@ -17,7 +17,7 @@ class RateLimitMiddleware
         $this->limiter = $limiter;
     }
 
-    public function handle($request, Closure $next, $maxAttempts = 5, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 50, $decayMinutes = 1)
     {
         $key = $request->ip();
 
