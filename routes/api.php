@@ -3,6 +3,7 @@
 use App\Http\Controllers\V1\GroupController;
 use App\Http\Controllers\V1\UserController;
 use App\Http\Controllers\V1\AuthController;
+use App\Http\Controllers\V1\MiscController;
 use App\Http\Resources\V1\UserResource;
 use App\Http\Resources\V1\GroupResource;
 use Illuminate\Http\Request;
@@ -52,11 +53,13 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::delete('groups/{ulid}', [GroupController::class, 'delete']);
     Route::get('groups/join/{ulid}', [GroupController::class, 'join']);
     Route::get('groups/leave/{ulid}', [GroupController::class, 'leave']);
+    Route::get('groups/cancel/{ulid}', [GroupController::class, 'cancelRequest']);
 
     //Route::get('groups/{ulid}', [GroupController::class, 'showOwnerGroup']);
     Route::get('groups/{group}/kick/{user}', [GroupController::class, 'kick']);
     Route::get('groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
     Route::get('groups/{ulid}/invite', [GroupController::class, 'getInviteLink']);
     
+    Route::get('facultades', [MiscController::class, 'getFacultades']);
 
 });

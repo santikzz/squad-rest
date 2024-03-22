@@ -198,7 +198,7 @@ class GroupController extends Controller
         // }else{
         //     $group = Group::where('ulid', $ulid)->first();
         // }
-        
+
         $group = Group::where('ulid', $ulid)->first();
         $user = $request->user();
 
@@ -327,6 +327,25 @@ class GroupController extends Controller
         return response()->json(JoinRequestResource::collection($group->joinRequests));
     }
 
+    public function cancelRequest(Request $request, $ulid)
+    {
+
+        $group = Group::where('ulid', $ulid)->first();
+        if (!$group) {
+            return response()->json(['error' => ['code' => 'group_not_found', 'message' => 'The requested group was not found.']], Response::HTTP_NOT_FOUND);
+        }
+
+        $joinRequest = UserGroupJoinRequest::where('user_id', $request->user()->id)->where('group_id', $group->id);
+
+        if (!$joinRequest->exists()) {
+            return response()->json(['error' => ['code' => 'request_not_found', 'message' => 'You don\'t have a join request for this group.']], Response::HTTP_NOT_FOUND);
+        }
+
+        $joinRequest->delete();
+
+        return response()->json(['message' => 'Join request canceled'], Response::HTTP_OK);
+    }
+
     public function handleJoinRequest(Request $request, $requestId, $action)
     {
 
@@ -380,7 +399,7 @@ class GroupController extends Controller
             return response()->json(['error' => ['code' => 'unauthorized_group_access', 'message' => 'You are not authorized to access data of this group.']], Response::HTTP_BAD_REQUEST);
         }
 
-        if($group->invite == null){
+        if ($group->invite == null) {
             $group->invite = Str::random(10);
             $group->update();
         }
