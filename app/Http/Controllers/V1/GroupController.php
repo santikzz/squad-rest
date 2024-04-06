@@ -121,10 +121,11 @@ class GroupController extends Controller
 
             $group->save();
 
-            foreach ($validatedData['tags'] as $tag) {
-                $tag = Tag::where('tag', $tag)->first();
-                $group->tags()->attach($tag);
-            }
+            // temporarely disabled
+            // foreach ($validatedData['tags'] as $tag) {
+            //     $tag = Tag::where('tag', $tag)->first();
+            //     $group->tags()->attach($tag);
+            // }
 
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
