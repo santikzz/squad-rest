@@ -129,7 +129,7 @@ class GroupController extends Controller
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
             // return response()->json(['message' => 'Invalid parameters'], Response::HTTP_BAD_REQUEST);
-            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.', 'err' => $e]], Response::HTTP_BAD_REQUEST);
         }
     }
 
