@@ -85,7 +85,7 @@ class GroupController extends Controller
                 'description' => 'required|string|min:10|max:255',
                 'privacy' => 'required|string|in:open,closed,private',
                 // 'hasMemberLimit' => 'nullable|boolean',
-                'maxMembers' => 'nullable|integer|min:1|max:25',
+                'maxMembers' => 'nullable|integer|min:0|max:25',
                 'idCarrera' => 'required|integer|min:1',
                 'tags' => 'required|array',
                 'tags.*' => 'string|max:255',
@@ -98,7 +98,17 @@ class GroupController extends Controller
             $maxMembers = null;
             if ($request->has('maxMembers')) {
                 // $maxMembers = $validatedData['hasMemberLimit'] == 1 ? $validatedData['maxMembers'] : null;
+                
                 $maxMembers = $validatedData['maxMembers'];
+                
+                // max members failsafe
+                if($maxMembers <= 0){
+                    $maxMembers = null;
+                
+                }elseif($maxMembers >= 25){
+                    $maxMembers = 25;
+                }
+
             }
 
             $group->ulid = (string)$ulid;
