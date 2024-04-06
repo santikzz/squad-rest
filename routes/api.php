@@ -61,5 +61,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('groups/{ulid}/invite', [GroupController::class, 'getInviteLink']);
     
     Route::get('facultades', [MiscController::class, 'getFacultades']);
+    Route::get('carreras', [MiscController::class, 'getCarreras']);
 
 });

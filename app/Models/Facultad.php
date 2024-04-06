@@ -10,7 +10,7 @@ class Facultad extends Model
     use HasFactory;
 
     public function carreras(){
-        return $this->hasMany(Carrera::class);
+        return $this->hasMany(Carrera::class, 'id_facultad');
     }
 
 }

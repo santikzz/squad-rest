@@ -20,9 +20,15 @@ class MiscController extends Controller
         // $facultades = Facultad::with('carrera')->get();
         // $facultades = Facultad::all();
         
-        $facultades = Facultad::with('carreras')->toSql();
-        dd($facultades);
+        $facultades = Facultad::with('carreras')->get();
+        // $facultades = Facultad::all();
+        // dd($facultades);
 
-        // return response()->json($facultades);
+        return response()->json($facultades);
+    }
+
+    public function getCarreras(Request $request){
+        $carreras = Carrera::with('facultad')->get();
+        return response()->json($carreras);
     }
 }
