@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('surname');
             $table->text('about')->nullable();
             $table->string('email')->unique();
+
+            $table->unsignedBigInteger('id_carrera')->nullable();
+            // $table->foreign('id_carrera')->references('id')->on('carreras')->onDelete('');
+            $table->string('profile_image')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

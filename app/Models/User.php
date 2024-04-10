@@ -34,6 +34,10 @@ class User extends Authenticatable
         return $this->hasMany(UserGroupJoinRequest::class, 'user_id');
     }
 
+    public function carrera(){
+        return $this->belongsTo(Carrera::class, 'id_carrera');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

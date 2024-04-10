@@ -87,7 +87,7 @@ class GroupController extends Controller
                 // 'hasMemberLimit' => 'nullable|boolean',
                 'maxMembers' => 'nullable|integer|min:0|max:25',
                 'idCarrera' => 'required|integer|min:1',
-                'tags' => 'required|array',
+                'tags' => 'required|array', // hardcoded "none" tag in reactjs frontend :P
                 'tags.*' => 'string|max:255',
             ]);
 
@@ -130,7 +130,7 @@ class GroupController extends Controller
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
             // return response()->json(['message' => 'Invalid parameters'], Response::HTTP_BAD_REQUEST);
-            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.', 'err' => $e]], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
         }
     }
 

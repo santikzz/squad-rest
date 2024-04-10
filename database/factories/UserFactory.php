@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\Carrera;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -23,12 +24,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $id_carrera = $this->faker->randomElement(Carrera::pluck('id')->toArray());
+
         return [
             'ulid' => $this->faker->md5(),
             'name' => $this->faker->name(),
             'surname' => $this->faker->lastName(),
             'about' => $this->faker->paragraph(),
             'email' => $this->faker->unique()->safeEmail(),
+            'id_carrera' => $id_carrera,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

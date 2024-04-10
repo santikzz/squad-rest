@@ -17,5 +17,9 @@ class Carrera extends Model
         return $this->hasMany(Group::class);
     }
 
+    public function users(){
+        return $this->hasMany(User::class);
+    }
+
 
 }

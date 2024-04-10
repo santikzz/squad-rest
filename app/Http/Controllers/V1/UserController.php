@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\UserCollection;
 use App\Http\Resources\V1\UserResource;
+use App\Http\Resources\V1\UserDetailResource;
 use App\Http\Resources\V1\GroupResource;
 use App\Http\Resources\V1\JoinRequestResource;
 use App\Models\User;
@@ -27,9 +28,10 @@ class UserController extends Controller
     // get user data with ulid
     public function show(Request $request, $ulid)
     {
-        $user = User::where('ulid', $ulid)->first();
+        $user = User::with('carrera.facultad')->where('ulid', $ulid)->first();
         if ($user) {
-            return response()->json(new UserResource($user));
+            return response()->json(new UserDetailResource($user));
+            // return response()->json($user);
         } else {
             return response()->json(['error' => ['code' => 'user_not_found', 'message' => 'User not found']], Response::HTTP_NOT_FOUND);
         }
