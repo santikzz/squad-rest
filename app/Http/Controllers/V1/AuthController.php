@@ -38,9 +38,9 @@ class AuthController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name' => 'required|string|max:50',
-                'surname' => 'required|string|max:50',
-                'email' => 'required|string|email|max:255',
+                'name' => 'required|string|min:4|max:32',
+                'surname' => 'required|string|min:4|max:32',
+                'email' => 'required|string|email|max:125',
                 'password' => 'required|string|min:8|confirmed',
             ]);
         } catch (ValidationException $e) {

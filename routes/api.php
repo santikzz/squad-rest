@@ -29,6 +29,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1'], funct
     // Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5:10'); // rate limit error: 429
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']); // rate limit error: 429
+
+    Route::get('facultades', [MiscController::class, 'getFacultades']);
+    Route::get('carreras', [MiscController::class, 'getCarreras']);
 });
 
 // user authentication protected endpoints
@@ -61,8 +64,5 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('groups/{group}/kick/{user}', [GroupController::class, 'kick']);
     Route::get('groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
     Route::get('groups/{ulid}/invite', [GroupController::class, 'getInviteLink']);
-    
-    Route::get('facultades', [MiscController::class, 'getFacultades']);
-    Route::get('carreras', [MiscController::class, 'getCarreras']);
 
 });
