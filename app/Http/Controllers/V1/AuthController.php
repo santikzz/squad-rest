@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Carrera;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Ulid\Ulid;
@@ -42,6 +43,7 @@ class AuthController extends Controller
                 'surname' => 'required|string|min:4|max:32',
                 'email' => 'required|string|email|max:125',
                 'password' => 'required|string|min:8|confirmed',
+                'idCarrera' => 'string|min:1'
             ]);
         } catch (ValidationException $e) {
             return response()->json(['error' => ['code' => 'invalid_registration_input', 'message' => 'Invalid input data for user registration. Please check your input.']], Response::HTTP_BAD_REQUEST);
@@ -52,6 +54,16 @@ class AuthController extends Controller
             return response()->json(['error' => ['code' => 'email_already_taken', 'message' => 'The email address is already taken.']], Response::HTTP_BAD_REQUEST);
         }
 
+
+        $idCarrera = null;
+        if ($request->has('idCarrera')) {
+            $idCarrera = $validatedData["idCarrera"];
+
+            if (!Carrera::where('id', $idCarrera)->exists()) {
+                return response()->json(['error' => ['code' => 'invalid_idCarrera', 'message' => 'idCarrera doesn\'t exist']], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         $ulid = Ulid::generate(true);
 
         $user = User::create([
@@ -60,6 +72,7 @@ class AuthController extends Controller
             'surname' => $validatedData['surname'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
+            'id_carrera' => $idCarrera,
         ]);
 
         // return response()->json([
