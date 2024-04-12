@@ -90,6 +90,12 @@ class UserController extends Controller
         // $user = $request->user();
         $image = $request->file('avatar');
 
+        /* ==== useful documentation ====
+            https://www.itsolutionstuff.com/post/laravel-11-resize-image-before-upload-exampleexample.html
+            https://image.intervention.io/v2
+            https://medium.com/@laravelprotips/storing-public-and-private-files-images-in-laravel-a-comprehensive-guide-6620789fad3b
+        */
+
         // $filename = $image->hashName();
         // $img = Image::read($image->path());
         // $img->resize(150, 150, function($constraint){
