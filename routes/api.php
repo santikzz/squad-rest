@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     
     Route::get('user/{ulid}', [UserController::class, 'show']);
     Route::put('user', [UserController::class, 'update']);
+    Route::post('user/avatar', [UserController::class, 'updateAvatar']);
 
     Route::get('user/requests', [UserController::class, 'getJoinRequests']);
     Route::get('user/requests/{requestId}/{action}', [GroupController::class, 'handleJoinRequest']);

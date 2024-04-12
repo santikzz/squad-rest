@@ -16,6 +16,7 @@ use App\Models\UserGroupJoinRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
+use Intervention\Image\Laravel\Facades\Image;
 
 class UserController extends Controller
 {
@@ -70,10 +71,45 @@ class UserController extends Controller
             $user->save();
             // return response()->json(new UserResource($user), Response::HTTP_OK);
             return response()->json(['message' => 'User data modified successfully.'], Response::HTTP_OK);
-
         } catch (ValidationException $e) {
             return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'Invalid or malformed parameters for user modification.']], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    public function updateAvatar(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => ['code' => 'invalid_image']], Response::HTTP_BAD_REQUEST);
+        }
+
+        // $user = $request->user();
+        $image = $request->file('avatar');
+
+        // $filename = $image->hashName();
+        // $img = Image::read($image->path());
+        // $img->resize(150, 150, function($constraint){
+        //     $constraint->aspectRatio();
+        // })->save('/avatar/'.$filename);
+
+        // $filename = $request->user()->ulid . "_" . $file->hashName() . "." . $file->extension();
+
+        $path = $image->storeAs(
+            'public/avatar',
+            $image->hashName()
+        );
+
+        if($path){
+            $user = $request->user();
+            $user->profile_image = $path;
+            $user->save();
+        }
+
+        return response()->json(['path' => $path], Response::HTTP_OK);
     }
 
     // only group owner can delete
