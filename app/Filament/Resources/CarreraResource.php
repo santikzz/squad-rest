@@ -7,9 +7,13 @@ use App\Filament\Resources\CarreraResource\RelationManagers;
 use App\Models\Carrera;
 use App\Models\Facultad;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,12 +32,15 @@ class CarreraResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                ->label('Nombre'),
-                Forms\Components\Select::make('id_carrera')
-                ->label('Carrera')
-                ->options(Facultad::all()->pluck('name', 'id'))
-                ->searchable()
+                Section::make([
+                    Select::make('id_facultad')
+                        ->label('Facultad')
+                        ->options(Facultad::all()->pluck('name', 'id'))
+                        ->searchable(),
+                    TextInput::make('name')
+                        ->label('Nombre Carrera')
+                ])
+
             ]);
     }
 
@@ -41,11 +48,9 @@ class CarreraResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                TextColumn::make('name'),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -58,9 +63,8 @@ class CarreraResource extends Resource
                 Group::make('facultad.name'),
             ])
             ->defaultGroup('facultad.name')
-            ->paginated(['all']);
-
-    
+            ->paginated(['all'])
+            ->recordUrl('');
     }
 
     public static function getRelations(): array

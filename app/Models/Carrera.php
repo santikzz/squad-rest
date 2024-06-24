@@ -21,5 +21,11 @@ class Carrera extends Model
         return $this->hasMany(User::class);
     }
 
+    protected $fillable = [
+        'id_facultad',
+        'name',
+    ];
+
+
 
 }

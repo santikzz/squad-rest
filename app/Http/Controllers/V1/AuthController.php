@@ -23,7 +23,7 @@ class AuthController extends Controller
             return response()->json(['error' => ['code' => 'invalid_username_or_password', 'message' => 'Invalid username or password']], Response::HTTP_BAD_REQUEST);
         }
 
-        $user->tokens()->delete();
+        // $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

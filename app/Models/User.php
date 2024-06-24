@@ -38,11 +38,14 @@ class User extends Authenticatable
         return $this->belongsTo(Carrera::class, 'id_carrera');
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public function reportsMade(){
+        return $this->hasMany(Report::class, 'reporter_user_id');
+    }
+
+    public function reportsReceived(){
+        return $this->hasMany(Report::class, 'reported_user_id');
+    }
+
     protected $fillable = [
         'ulid',
         'name',

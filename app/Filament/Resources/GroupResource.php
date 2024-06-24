@@ -9,9 +9,16 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+
+
 
 class GroupResource extends Resource
 {
@@ -35,63 +42,88 @@ class GroupResource extends Resource
         return $table
             ->columns([
 
-                Tables\Columns\Layout\Stack::make([
+                Stack::make([
 
-
-                    Tables\Columns\Layout\Split::make([
-                        Tables\Columns\TextColumn::make('privacy')
+                    Split::make([
+                        TextColumn::make('privacy')
                             ->state(function (Group $record): string {
                                 return strtoupper($record->privacy);
                             })
-                            ->badge()->colors([
+                            ->badge()
+                            ->colors([
                                 'success' => 'OPEN',
                                 'warning' => 'CLOSED',
                                 'danger' => 'PRIVATE',
-                            ])->sortable()->grow(false),
-                        Tables\Columns\TextColumn::make('title')->limit(64)->grow(false)->searchable(),
-                        Tables\Columns\TextColumn::make('tags.tag')->badge()->color('info'),
+                            ])
+                            ->sortable()
+                            ->grow(false),
+                        TextColumn::make('title')
+                            ->limit(64)
+                            ->grow(false)
+                            ->searchable(),
+                        // TextColumn::make('tags.tag')
+                        //     ->badge()
+                        //     ->color('info'),
 
 
                     ]),
 
-                    Tables\Columns\Layout\Panel::make([
+                    Panel::make([
 
-                        Tables\Columns\Layout\Stack::make([
+                        Stack::make([
 
-                            Tables\Columns\Layout\Split::make([
-                                Tables\Columns\TextColumn::make('owner.name')->state(function (Group $record): string {
-                                    return $record->owner->name . ' ' . $record->owner->surname;
-                                })->icon('heroicon-s-user')->sortable()->searchable()->grow(false),
-                                Tables\Columns\TextColumn::make('created_at')->dateTime('M j, Y')->sortable()->searchable()->icon('heroicon-s-calendar')->grow(false),
-                                Tables\Columns\TextColumn::make('memebers')
+                            Split::make([
+                                TextColumn::make('owner.name')
+                                    ->state(function (Group $record): string {
+                                        return $record->owner->name . ' ' . $record->owner->surname;
+                                    })
+                                    ->icon('heroicon-s-user')
+                                    ->sortable()
+                                    ->searchable()
+                                    ->grow(false),
+                                TextColumn::make('created_at')
+                                    ->dateTime('M j, Y')
+                                    ->sortable()
+                                    ->searchable()
+                                    ->icon('heroicon-s-calendar')
+                                    ->grow(false),
+                                TextColumn::make('memebers')
                                     ->state(function (Group $record): string {
                                         $limit = $record->max_members != null ? ' / ' . $record->max_members : '';
-                                        return $record->members->count()+1 . $limit;
+                                        return $record->members->count() + 1 . $limit;
                                     })
-                                    ->icon('heroicon-s-user')->grow(false)->alignRight(),
-                                Tables\Columns\TextColumn::make('carrera')
-                                ->state(function (Group $record): string {
-                                    return $record->carrera->facultad->name.' - '.$record->carrera->name;
-                                })->icon('heroicon-s-academic-cap'),
-
-
+                                    ->icon('heroicon-s-user')
+                                    ->grow(false)
+                                    ->alignRight(),
+                                TextColumn::make('carrera')
+                                    ->state(function (Group $record): string {
+                                        return $record->carrera->facultad->name . ' - ' . $record->carrera->name;
+                                    })
+                                    ->icon('heroicon-s-academic-cap'),
                             ]),
 
-                            Tables\Columns\TextColumn::make('description')->searchable()->color('gray'),
-                            Tables\Columns\TextColumn::make('members.name')
+                            TextColumn::make('description')
+                                ->searchable()
+                                ->color('gray'),
+                            TextColumn::make('members.name')
                                 ->state(function (Group $record): string {
                                     $members = [];
                                     foreach ($record->members as $member) {
                                         array_push($members, $member->name . ' ' . $member->surname);
                                     }
                                     return implode(', ', $members);
-                                })->searchable()->color('gray'),
+                                })
+                                ->searchable()
+                                ->color('gray'),
 
-                        ])->collapsible()->space(3),
+                        ])
+                            ->collapsible()
+                            ->space(3),
 
                     ]), // end panel
 
-                ])->space(3), // end stack
+                ])
+                    ->space(3), // end stack
 
 
             ])
@@ -105,7 +137,8 @@ class GroupResource extends Resource
                 // Tables\Actions\BulkActionGroup::make([
                 //     Tables\Actions\DeleteBulkAction::make(),
                 // ]),
-            ]);
+            ])
+            ->recordUrl('');;
     }
 
     public static function getRelations(): array

@@ -12,11 +12,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\TextColumn;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 2;
 
@@ -32,24 +32,30 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                ->state(function (User $record): string {
-                    return $record->name.' '.$record->surname;
-                })->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('name')
+                    ->state(function (User $record): string {
+                        return $record->name . ' ' . $record->surname;
+                    })
+                    ->searchable()
+                    ->copyable(),
+                TextColumn::make('email')
                     ->icon('heroicon-s-envelope')
                     ->searchable()
                     ->copyable()
                     ->copyMessage('Email copied to your clipboard!'),
-                Tables\Columns\TextColumn::make('Groups owned')
-                ->state(function (User $record): string {
-                    return $record->ownedGroups->count();
-                })->alignCenter(),
-                Tables\Columns\TextColumn::make('Groups joined')
-                ->state(function (User $record): string {
-                    return $record->joinedGroups->count();
-                })->alignCenter(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->icon('heroicon-s-calendar'),
+                TextColumn::make('Groups owned')
+                    ->state(function (User $record): string {
+                        return $record->ownedGroups->count();
+                    })
+                    ->alignCenter(),
+                TextColumn::make('Groups joined')
+                    ->state(function (User $record): string {
+                        return $record->joinedGroups->count();
+                    })
+                    ->alignCenter(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->icon('heroicon-s-calendar'),
             ])
             ->filters([
                 //
@@ -59,9 +65,11 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->striped()
+            ->recordUrl('');
     }
 
     public static function getRelations(): array

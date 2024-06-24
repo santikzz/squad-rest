@@ -11,6 +11,7 @@ class JoinRequestResource extends JsonResource
     {
         return [
             'requestId' => $this->request_id,
+            'createdAt' => $this->created_at,
             'group' => new GroupShortResource($this->group),
             'user' => new UserGroupResource($this->user),
             'actions' => [

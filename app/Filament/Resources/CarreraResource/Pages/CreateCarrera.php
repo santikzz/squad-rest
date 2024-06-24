@@ -9,4 +9,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCarrera extends CreateRecord
 {
     protected static string $resource = CarreraResource::class;
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

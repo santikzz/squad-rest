@@ -3,7 +3,9 @@
 use App\Http\Controllers\V1\GroupController;
 use App\Http\Controllers\V1\UserController;
 use App\Http\Controllers\V1\AuthController;
+use App\Http\Controllers\V1\FeedbackController;
 use App\Http\Controllers\V1\MiscController;
+use App\Http\Controllers\V1\ReportController;
 use App\Http\Resources\V1\UserResource;
 use App\Http\Resources\V1\GroupResource;
 use Illuminate\Http\Request;
@@ -42,17 +44,19 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     // private self user endpoints
     Route::get('user', function (Request $request) { return new UserResource($request->user()); });
     
-    Route::get('user/{ulid}', [UserController::class, 'show']);
     Route::put('user', [UserController::class, 'update']);
     Route::post('user/avatar', [UserController::class, 'updateAvatar']);
-
+    
+    
+    Route::get('user/notifications', [UserController::class, 'getNotifications']);
     Route::get('user/requests', [UserController::class, 'getJoinRequests']);
     Route::get('user/requests/{requestId}/{action}', [GroupController::class, 'handleJoinRequest']);
     Route::get('user/joined', [UserController::class, 'getJoinedGroups']);
     Route::get('user/groups', [UserController::class, 'getOwnedGroups']);
     
+    Route::get('user/{ulid}', [UserController::class, 'show']);
     
-    Route::get('groups', [GroupController::class, 'index']);
+    Route::get('groups', [GroupController::class, 'index']);    
     Route::get('groups/{ulid}', [GroupController::class, 'show']);
     Route::post('groups', [GroupController::class, 'create']);
     Route::put('groups/{ulid}', [GroupController::class, 'update']);
@@ -65,5 +69,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\V1', 'middl
     Route::get('groups/{group}/kick/{user}', [GroupController::class, 'kick']);
     Route::get('groups/{ulid}/requests', [GroupController::class, 'getJoinRequests']);
     Route::get('groups/{ulid}/invite', [GroupController::class, 'getInviteLink']);
+    
+    Route::post('feedback', [UserController::class, 'submitFeedback']);
+    Route::post('report', [UserController::class, 'submitReport']);
 
 });

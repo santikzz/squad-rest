@@ -6,9 +6,13 @@ use App\Filament\Resources\FacultadResource\Pages;
 use App\Filament\Resources\FacultadResource\RelationManagers;
 use App\Models\Facultad;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -26,7 +30,9 @@ class FacultadResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name'),
+                Section::make([
+                    TextInput::make('name')->string()->required()->unique(),
+                ]),
             ]);
     }
 
@@ -34,7 +40,7 @@ class FacultadResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                TextColumn::make('name'),
             ])
             ->filters([
                 //
@@ -47,7 +53,9 @@ class FacultadResource extends Resource
                 //     Tables\Actions\DeleteBulkAction::make(),
                 // ]),
             ])
-            ->paginated(['all']);
+            ->paginated(['all'])
+            ->striped()
+            ->recordUrl('');
     }
 
     public static function getRelations(): array

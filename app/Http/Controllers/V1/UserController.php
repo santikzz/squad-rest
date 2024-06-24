@@ -10,6 +10,9 @@ use App\Http\Resources\V1\GroupResource;
 use App\Http\Resources\V1\JoinRequestResource;
 use App\Models\User;
 use App\Models\Group;
+use App\Models\Carrera;
+use App\Models\Feedback;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserGroupJoinRequest;
@@ -50,6 +53,7 @@ class UserController extends Controller
                 'surname' => 'string|max:50',
                 'about' => 'string|min:255',
                 'password' => 'string|min:8|confirmed',
+                'idCarrera' => 'integer|min:1',
             ]);
 
             if ($request->has('name')) {
@@ -60,6 +64,14 @@ class UserController extends Controller
             }
             if ($request->has('about')) {
                 $user->about = $validatedData['about'];
+            }
+            if ($request->has('idCarrera')) {
+                $idCarrera = $validatedData['idCarrera'];
+                $carreraExists = Carrera::where('id_carrera', $idCarrera)->exists();
+                if (!$carreraExists) {
+                    return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'invalid idCarrera.']], Response::HTTP_BAD_REQUEST);
+                }
+                $user->idCarrera = $idCarrera;
             }
 
             if ($request->has('old_password', 'password', 'password_confirmation')) {
@@ -109,7 +121,7 @@ class UserController extends Controller
             $image->hashName()
         );
 
-        if($path){
+        if ($path) {
             $user = $request->user();
             $user->profile_image = $path;
             $user->save();
@@ -150,11 +162,81 @@ class UserController extends Controller
     {
         $user = $request->user();
         $ownedGroups = $user->ownedGroups()->get();
-        $joinRequests = collect();
-        // Iterate over each owned group and retrieve its join requests
+        $joinRequests = collect(); // empty collection
+
+        // iterate over each owned group and retrieve its join requests
         foreach ($ownedGroups as $group) {
             $joinRequests = $joinRequests->merge($group->joinRequests);
         }
         return response()->json(JoinRequestResource::collection($joinRequests));
+    }
+
+    public function getNotifications(Request $request)
+    {
+        $user = $request->user();
+        $ownedGroups = $user->ownedGroups()->get();
+        $joinRequests = collect();
+
+        foreach ($ownedGroups as $group) {
+            $joinRequests = $joinRequests->merge($group->joinRequests);
+        }
+
+        $totalBadges = 0;
+        $totalBadges += $joinRequests->count();
+
+
+        return response()->json([
+            "badges" => $totalBadges,
+        ]);
+    }
+
+    public function submitFeedback(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+
+            $valid = $request->validate([
+                'description' => 'required|string|min:12'
+            ]);
+
+            $feedback = new Feedback();
+            $feedback->user_id = $user->id;
+            $feedback->description = $valid['description'];
+
+            $feedback->save();
+
+            return response()->json(['status' => 'OK'], Response::HTTP_OK);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function submitReport(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            $valid = $request->validate([
+                'reportedId' => 'required|string|min:1',
+                'description' => 'required|string|min:12'
+            ]);
+
+            $reportedUser = User::where('ulid', $valid['reportedId'])->first();
+            if (!$reportedUser) {
+                return response()->json(['error' => ['code' => 'invalid_user', 'message' => 'Invalid user ID.']], Response::HTTP_BAD_REQUEST);
+            }
+
+            $report = new Report();
+            $report->reporter_user_id = $user->id;
+            $report->reported_user_id = $reportedUser->id;
+            $report->description = $valid['description'];
+
+            $report->save();
+
+            return response()->json(['status' => 'OK'], Response::HTTP_OK);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
+        }
     }
 }

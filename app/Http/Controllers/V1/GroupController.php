@@ -26,7 +26,12 @@ class GroupController extends Controller
     public function index(Request $request)
     {
 
+        $user = $request->user();       
+        
+        // unfiltered
         $groups = Group::where('privacy', '!=', 'private')->orderby('created_at', 'desc');
+        
+        // $groups = Group::where('privacy', '!=', 'private')->where('id_carrera', $user->id_carrera)->orderby('created_at', 'desc');
 
         if ($request->has('search')) {
             $seach_param = $request->query('search');
@@ -44,7 +49,8 @@ class GroupController extends Controller
             }
         }
 
-        return new GroupCollection($groups->paginate());
+        return new GroupCollection($groups->paginate(4));
+        // return response()->json($groups->paginate());
     }
 
     // show group detail data
@@ -86,13 +92,13 @@ class GroupController extends Controller
                 'privacy' => 'required|string|in:open,closed,private',
                 // 'hasMemberLimit' => 'nullable|boolean',
                 'maxMembers' => 'nullable|integer|min:0|max:25',
-                'idCarrera' => 'required|integer|min:1',
-                'tags' => 'required|array', // hardcoded "none" tag in reactjs frontend :P
-                'tags.*' => 'string|max:255',
+                // 'idCarrera' => 'required|integer|min:1',
+                // 'tags' => 'required|array', // hardcoded "none" tag in reactjs frontend :P
+                // 'tags.*' => 'string|max:255',
             ]);
 
             $group = new Group();
-
+            
             $ulid = Ulid::generate(true);
 
             $maxMembers = null;
@@ -117,7 +123,9 @@ class GroupController extends Controller
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
             $group->privacy = $validatedData['privacy'];
-            $group->id_carrera = $validatedData['idCarrera'];
+            
+            // $group->id_carrera = $validatedData['idCarrera'];
+            $group->id_carrera = $request->user()->id_carrera; // for now inherit carrera_id from user
 
             $group->save();
 
@@ -253,7 +261,8 @@ class GroupController extends Controller
                 'request_id' => Str::random(10),
                 'user_id' => $user->id,
                 'group_id' => $group->id,
-                'owner_id' => $group->owner_id
+                'owner_id' => $group->owner_id,
+                'created_at' => DB::raw('CURRENT_TIMESTAMP')
             ]);
             return response()->json(['message' => 'Join request sent successfully.']);
         }
