@@ -39,18 +39,19 @@ class GroupController extends Controller
                 ->orWhere('description', 'LIKE', '%' . $seach_param . '%');
         }
 
-        if ($request->has('tags')) {
-            $tags = explode(',', $request->query('tags'));
+        // if ($request->has('tags')) {
+        //     $tags = explode(',', $request->query('tags'));
 
-            foreach ($tags as $tag) {
-                $groups = $groups->whereHas('tags', function ($query) use ($tag) {
-                    $query->where('tag', $tag);
-                });
-            }
-        }
+        //     foreach ($tags as $tag) {
+        //         $groups = $groups->whereHas('tags', function ($query) use ($tag) {
+        //             $query->where('tag', $tag);
+        //         });
+        //     }
+        // }
 
-        return new GroupCollection($groups->paginate(4));
-        // return response()->json($groups->paginate());
+        return new GroupCollection($groups->get());
+        // return new GroupCollection($groups->paginate());
+        // return response()->json($groups);
     }
 
     // show group detail data

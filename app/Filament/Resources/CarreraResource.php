@@ -36,9 +36,11 @@ class CarreraResource extends Resource
                     Select::make('id_facultad')
                         ->label('Facultad')
                         ->options(Facultad::all()->pluck('name', 'id'))
+                        ->required()
                         ->searchable(),
                     TextInput::make('name')
                         ->label('Nombre Carrera')
+                        ->required()
                 ])
 
             ]);

@@ -39,14 +39,14 @@ class AuthController extends Controller
     {
         try {
             $validatedData = $request->validate([
+                'email' => 'required|string|email|max:125',
                 'name' => 'required|string|min:4|max:32',
                 'surname' => 'required|string|min:4|max:32',
-                'email' => 'required|string|email|max:125',
                 'password' => 'required|string|min:8|confirmed',
-                'idCarrera' => 'string|min:1'
+                'idCarrera' => 'required|string'
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['error' => ['code' => 'invalid_registration_input', 'message' => 'Invalid input data for user registration. Please check your input.']], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         $alreadyExists = User::where('email', $validatedData['email'])->exists();
@@ -54,14 +54,9 @@ class AuthController extends Controller
             return response()->json(['error' => ['code' => 'email_already_taken', 'message' => 'The email address is already taken.']], Response::HTTP_BAD_REQUEST);
         }
 
-
-        $idCarrera = null;
-        if ($request->has('idCarrera')) {
-            $idCarrera = $validatedData["idCarrera"];
-
-            if (!Carrera::where('id', $idCarrera)->exists()) {
-                return response()->json(['error' => ['code' => 'invalid_idCarrera', 'message' => 'idCarrera doesn\'t exist']], Response::HTTP_BAD_REQUEST);
-            }
+        $idCarrera = (int)$validatedData["idCarrera"];
+        if (!Carrera::where('id', $idCarrera)->exists()) {
+            return response()->json(['error' => ['code' => 'invalid_idCarrera', 'message' => 'idCarrera doesn\'t exist']], Response::HTTP_BAD_REQUEST);
         }
 
         $ulid = Ulid::generate(true);

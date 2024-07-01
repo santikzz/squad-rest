@@ -49,10 +49,10 @@ class UserController extends Controller
         try {
 
             $validatedData = $request->validate([
-                'name' => 'string|max:50',
-                'surname' => 'string|max:50',
-                'about' => 'string|min:255',
-                'password' => 'string|min:8|confirmed',
+                'name' => 'string|min:2|max:50',
+                'surname' => 'string|min:2|max:50',
+                'about' => 'string|max:255',
+                // 'password' => 'string|min:8|confirmed',
                 'idCarrera' => 'integer|min:1',
             ]);
 
@@ -67,11 +67,11 @@ class UserController extends Controller
             }
             if ($request->has('idCarrera')) {
                 $idCarrera = $validatedData['idCarrera'];
-                $carreraExists = Carrera::where('id_carrera', $idCarrera)->exists();
+                $carreraExists = Carrera::where('id', $idCarrera)->exists();
                 if (!$carreraExists) {
                     return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'invalid idCarrera.']], Response::HTTP_BAD_REQUEST);
                 }
-                $user->idCarrera = $idCarrera;
+                $user->id_carrera = $idCarrera;
             }
 
             if ($request->has('old_password', 'password', 'password_confirmation')) {
@@ -83,13 +83,17 @@ class UserController extends Controller
             $user->save();
             // return response()->json(new UserResource($user), Response::HTTP_OK);
             return response()->json(['message' => 'User data modified successfully.'], Response::HTTP_OK);
+        
         } catch (ValidationException $e) {
-            return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'Invalid or malformed parameters for user modification.']], Response::HTTP_BAD_REQUEST);
+            // return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'Invalid or malformed parameters for user modification.']], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
     }
 
     public function updateAvatar(Request $request)
     {
+
+        $user = $request->user();
 
         try {
             $request->validate([
@@ -116,14 +120,23 @@ class UserController extends Controller
 
         // $filename = $request->user()->ulid . "_" . $file->hashName() . "." . $file->extension();
 
+        $userData = User::where('ulid', $user->ulid)->first();
+        // if($userData->profile_image != null){
+        // remove
+        // }
+        
+        $filename = $userData->ulid.'.'.$image->getClientOriginalExtension();
+
         $path = $image->storeAs(
             'public/avatar',
-            $image->hashName()
+            $filename
+            // $image->hashName()
         );
-
+        
         if ($path) {
             $user = $request->user();
-            $user->profile_image = $path;
+            // $user->profile_image = $path;
+            $user->profile_image = 'storage/avatar/'.$filename;
             $user->save();
         }
 

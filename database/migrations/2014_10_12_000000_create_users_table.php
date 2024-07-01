@@ -19,8 +19,9 @@ return new class extends Migration
             $table->text('about')->nullable();
             $table->string('email')->unique();
 
-            $table->unsignedBigInteger('id_carrera')->nullable();
-            // $table->foreign('id_carrera')->references('id')->on('carreras')->onDelete('');
+            $table->unsignedBigInteger('id_carrera');
+            $table->foreign('id_carrera')->references('id')->on('carreras')->onDelete('cascade');
+
             $table->string('profile_image')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
