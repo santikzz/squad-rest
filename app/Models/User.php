@@ -52,6 +52,7 @@ class User extends Authenticatable
         'surname',
         'email',
         'password',
+        'id_carrera',
     ];
 
     /**

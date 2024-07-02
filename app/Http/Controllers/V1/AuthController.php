@@ -48,13 +48,13 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
-
+        
         $alreadyExists = User::where('email', $validatedData['email'])->exists();
         if ($alreadyExists) {
             return response()->json(['error' => ['code' => 'email_already_taken', 'message' => 'The email address is already taken.']], Response::HTTP_BAD_REQUEST);
         }
 
-        $idCarrera = (int)$validatedData["idCarrera"];
+        $idCarrera = $validatedData["idCarrera"];
         if (!Carrera::where('id', $idCarrera)->exists()) {
             return response()->json(['error' => ['code' => 'invalid_idCarrera', 'message' => 'idCarrera doesn\'t exist']], Response::HTTP_BAD_REQUEST);
         }
