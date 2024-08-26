@@ -36,7 +36,8 @@ class GroupResource extends JsonResource
             'privacy' => $this->privacy,
             'members' => UserGroupResource::collection($this->members),
             'creationDate' => $this->created_at,
-            'user' => ['isMember' => $joined, 'hasJoinRequest' => $joinRequest]
+            'user' => ['isMember' => $joined, 'hasJoinRequest' => $joinRequest],
+            'isOwner' => ($this->owner->ulid == $user->ulid),
         ];
     }
 }

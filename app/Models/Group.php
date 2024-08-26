@@ -47,8 +47,13 @@ class Group extends Model
         return $this->hasMany(UserGroupJoinRequest::class, 'group_id');
     }
 
-    public function carrera(){
+    public function carrera()
+    {
         return $this->belongsTo(Carrera::class, 'id_carrera');
     }
 
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'group_id');
+    }
 }

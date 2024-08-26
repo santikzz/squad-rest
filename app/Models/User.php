@@ -38,12 +38,20 @@ class User extends Authenticatable
         return $this->belongsTo(Carrera::class, 'id_carrera');
     }
 
+    public function facultad(){
+        return $this->belongsTo(Facultad::class);
+    }
+
     public function reportsMade(){
         return $this->hasMany(Report::class, 'reporter_user_id');
     }
 
     public function reportsReceived(){
         return $this->hasMany(Report::class, 'reported_user_id');
+    }
+
+    public function notifications(){
+        return $this->hasMany(Notification::class, 'user_id');
     }
 
     protected $fillable = [

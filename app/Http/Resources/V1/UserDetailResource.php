@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class UserDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
-    {   
+    {
 
         $memberSince = Carbon::parse($this->created_at)->format('d/m/Y');
 
@@ -22,7 +22,9 @@ class UserDetailResource extends JsonResource
             'carrera' => $this->carrera->name,
             'email' => $this->email,
             'memberSince' => $memberSince,
-            'profileImg' => $this->profile_image,
+            'avatar' => $this->profile_image,
+            'avatarFallback' => strtoupper($this->name[0]) . strtoupper($this->surname[0]),
+            'isOwner' => ($this->ulid == $request->user()->ulid),
         ];
     }
 }

@@ -8,10 +8,12 @@ use App\Http\Resources\V1\UserResource;
 use App\Http\Resources\V1\UserDetailResource;
 use App\Http\Resources\V1\GroupResource;
 use App\Http\Resources\V1\JoinRequestResource;
+use App\Http\Resources\V1\NotificationResource;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Carrera;
 use App\Models\Feedback;
+use App\Models\Notification;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,10 @@ class UserController extends Controller
     {
         // disable all user listing
         // return new UserCollection(User::paginate());
+    }
+
+    public function self(Request $request){
+        return response()->json(new UserDetailResource($request->user()));
     }
 
     // get user data with ulid
@@ -81,9 +87,8 @@ class UserController extends Controller
             }
 
             $user->save();
-            // return response()->json(new UserResource($user), Response::HTTP_OK);
-            return response()->json(['message' => 'User data modified successfully.'], Response::HTTP_OK);
-        
+            return response()->json(new UserResource($user), Response::HTTP_OK);
+            // return response()->json(['message' => 'User data modified successfully.'], Response::HTTP_OK);
         } catch (ValidationException $e) {
             // return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'Invalid or malformed parameters for user modification.']], Response::HTTP_BAD_REQUEST);
             return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
@@ -124,19 +129,19 @@ class UserController extends Controller
         // if($userData->profile_image != null){
         // remove
         // }
-        
-        $filename = $userData->ulid.'.'.$image->getClientOriginalExtension();
+
+        $filename = $userData->ulid . '.' . $image->getClientOriginalExtension();
 
         $path = $image->storeAs(
             'public/avatar',
             $filename
             // $image->hashName()
         );
-        
+
         if ($path) {
             $user = $request->user();
             // $user->profile_image = $path;
-            $user->profile_image = 'storage/avatar/'.$filename;
+            $user->profile_image = 'storage/avatar/' . $filename;
             $user->save();
         }
 
@@ -194,13 +199,33 @@ class UserController extends Controller
             $joinRequests = $joinRequests->merge($group->joinRequests);
         }
 
+        $notifications = Notification::where('user_id', $user->id)->get();
+
         $totalBadges = 0;
-        $totalBadges += $joinRequests->count();
+        $totalBadges += $joinRequests->count() + $notifications->count();
+
 
 
         return response()->json([
+            "notifications" => NotificationResource::collection($notifications),
             "badges" => $totalBadges,
         ]);
+    }
+
+    public function dismissNotification(Request $request, $notifId)
+    {
+        $user = $request->user();
+
+        $notification = Notification::where('id', $notifId)->first();
+
+        if (!$notification) {
+            return response()->json(['error' => 'notification_not_found'], Response::HTTP_NOT_FOUND);
+        }
+        if ($user->id != $notification->user_id) {
+            return response()->json(['error' => 'notification_not_found'], Response::HTTP_NOT_FOUND);
+        }
+        $notification->delete();
+        return response()->json(['status' => 'OK'], Response::HTTP_OK);
     }
 
     public function submitFeedback(Request $request)
@@ -251,5 +276,43 @@ class UserController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['error' => ['code' => 'invalid_parameters', 'message' => 'One or more parameters are invalid.']], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+
+    public function environment(Request $request)
+    {
+
+        $user = $request->user();
+
+        // count notification badges
+        $ownedGroups = $user->ownedGroups()->get();
+        $joinRequests = collect();
+        foreach ($ownedGroups as $group) {
+            $joinRequests = $joinRequests->merge($group->joinRequests);
+        }
+        $notifications = Notification::where('user_id', $user->id)->get();
+        $totalNotifications = 0;
+        $totalNotifications += $joinRequests->count() + $notifications->count();
+
+        // return response()->json([
+        //     "notifications" => NotificationResource::collection($notifications),
+        //     "badges" => $totalNotifications,
+        // ]);
+
+        return response()->json([
+            'user' => [
+                'ulid' => $user->ulid,
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'email' => $user->email,
+                'avatar' => $user->profile_image,
+                'avatarFallback' => strtoupper($user->name[0]) . strtoupper($user->surname[0]),
+                'carrera' => $user->carrera->name,
+                'facultad' => $user->carrera->facultad->name,
+            ],
+            'notifications' => [
+                'badges' => $totalNotifications
+            ]
+        ], Response::HTTP_OK);
     }
 }

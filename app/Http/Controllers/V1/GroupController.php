@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Ulid\Ulid;
 use Illuminate\Support\Str;
 use App\Http\Resources\V1\JoinRequestResource;
+use App\Models\Notification;
 use App\Models\UserGroupJoinRequest;
 
 class GroupController extends Controller
@@ -26,11 +27,11 @@ class GroupController extends Controller
     public function index(Request $request)
     {
 
-        $user = $request->user();       
-        
+        $user = $request->user();
+
         // unfiltered
         $groups = Group::where('privacy', '!=', 'private')->orderby('created_at', 'desc');
-        
+
         // $groups = Group::where('privacy', '!=', 'private')->where('id_carrera', $user->id_carrera)->orderby('created_at', 'desc');
 
         if ($request->has('search')) {
@@ -92,30 +93,19 @@ class GroupController extends Controller
                 'description' => 'required|string|min:10|max:255',
                 'privacy' => 'required|string|in:open,closed,private',
                 // 'hasMemberLimit' => 'nullable|boolean',
-                'maxMembers' => 'nullable|integer|min:0|max:25',
+                'maxMembers' => 'required|integer|min:0|max:20',
                 // 'idCarrera' => 'required|integer|min:1',
                 // 'tags' => 'required|array', // hardcoded "none" tag in reactjs frontend :P
                 // 'tags.*' => 'string|max:255',
             ]);
 
             $group = new Group();
-            
+
             $ulid = Ulid::generate(true);
 
             $maxMembers = null;
-            if ($request->has('maxMembers')) {
-                // $maxMembers = $validatedData['hasMemberLimit'] == 1 ? $validatedData['maxMembers'] : null;
-                
+            if ($validatedData['maxMembers'] > 0) {
                 $maxMembers = $validatedData['maxMembers'];
-                
-                // max members failsafe
-                if($maxMembers <= 0){
-                    $maxMembers = null;
-                
-                }elseif($maxMembers >= 25){
-                    $maxMembers = 25;
-                }
-
             }
 
             $group->ulid = (string)$ulid;
@@ -124,7 +114,7 @@ class GroupController extends Controller
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
             $group->privacy = $validatedData['privacy'];
-            
+
             // $group->id_carrera = $validatedData['idCarrera'];
             $group->id_carrera = $request->user()->id_carrera; // for now inherit carrera_id from user
 
@@ -161,15 +151,19 @@ class GroupController extends Controller
                 'description' => 'required|string|min:10|max:255',
                 'privacy' => 'required|string|in:open,closed,private',
                 // 'hasMemberLimit' => 'nullable|boolean',
-                'maxMembers' => 'nullable|integer|min:1|max:25',
-                'idCarrera' => 'integer|min:1',
-                'tags' => 'required|array',
-                'tags.*' => 'string|max:255',
+                'maxMembers' => 'required|integer|min:0|max:20',
+                // 'idCarrera' => 'integer|min:1',
+                // 'tags' => 'required|array',
+                // 'tags.*' => 'string|max:255',
             ]);
 
+            // $maxMembers = null;
+            // if ($request->has('maxMembers')) {
+            //     // $maxMembers = $validatedData['maxMembers'] >= 1 ? $validatedData['maxMembers'] : null;
+            //     $maxMembers = $validatedData['maxMembers'];
+            // }
             $maxMembers = null;
-            if ($request->has('maxMembers')) {
-                // $maxMembers = $validatedData['maxMembers'] >= 1 ? $validatedData['maxMembers'] : null;
+            if ($validatedData['maxMembers'] != 0) {
                 $maxMembers = $validatedData['maxMembers'];
             }
 
@@ -177,19 +171,19 @@ class GroupController extends Controller
             $group->description = $validatedData['description'];
             $group->max_members = $maxMembers;
             $group->privacy = $validatedData['privacy'];
-            $group->id_carrera = $validatedData['idCarrera'];
+            // $group->id_carrera = $validatedData['idCarrera'];
 
             $group->update();
 
-            $group->tags()->detach();
-            foreach ($validatedData['tags'] as $tag) {
-                $tag = Tag::where('tag', $tag)->first();
-                $group->tags()->attach($tag);
-            }
+            // $group->tags()->detach();
+            // foreach ($validatedData['tags'] as $tag) {
+            //     $tag = Tag::where('tag', $tag)->first();
+            //     $group->tags()->attach($tag);
+            // }
 
             return response()->json(new GroupResource($group), Response::HTTP_OK);
         } catch (ValidationException $e) {
-            return response()->json(['error' => ['code' => 'invalid_group_parameters', 'message' => 'Invalid or malformed parameters for group creation.']], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => $e->errors()], Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -281,6 +275,14 @@ class GroupController extends Controller
             'user_id' => $user->id,
             'group_id' => $group->id
         ]);
+
+        if ($group->privacy == 'open') {
+            $notif = new Notification();
+            $notif->user_id = $group->owner->id;
+            $notif->content = $user->name . " " . $user->surname . " se ha unido a tu grupo " . $group->title;
+            $notif->save();
+        }
+
         return response()->json(['message' => 'Group joined successfully.'], Response::HTTP_OK);
     }
 
@@ -311,6 +313,8 @@ class GroupController extends Controller
         }
 
         $group->users()->detach($user);
+
+
 
         return response()->json(['message' => 'User kicked from the group successfully'], Response::HTTP_OK);
     }
@@ -399,6 +403,12 @@ class GroupController extends Controller
                 'group_id' => $group->id
             ]);
             DB::table('user_group_join_request')->where('request_id', $requestId)->delete();
+
+            $notif = new Notification();
+            $notif->user_id = $user->id;
+            $notif->content = "Tu solicitud para unirte al grupo " . $group->title . " fue aceptada!";
+            $notif->save();
+
             return response()->json(['message' => 'Request accepted'], Response::HTTP_OK);
         } elseif ($action == 'decline') {
 

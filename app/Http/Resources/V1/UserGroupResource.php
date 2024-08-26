@@ -14,7 +14,8 @@ class UserGroupResource extends JsonResource
             'ulid' => $this->ulid,
             'name' => $this->name,
             'surname' => $this->surname,
-            'profileImg' => $this->profile_image,
+            'avatar' => $this->profile_image,
+            'avatarFallback' => strtoupper($this->name[0]) . strtoupper($this->surname[0]),
         ];
     }
 }
